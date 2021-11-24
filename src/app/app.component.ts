@@ -11,6 +11,7 @@ import {
 } from "@angular/router";
 import { AppState } from "./reducers";
 import { isLoggedIn, isLoggedOut } from "./auth/auth.selectors";
+import { logout } from "./auth/auth.actions";
 
 @Component({
   selector: "app-root",
@@ -20,11 +21,11 @@ import { isLoggedIn, isLoggedOut } from "./auth/auth.selectors";
 export class AppComponent implements OnInit {
   loading = true;
 
-  isLoggedIn$:Observable<boolean>;
+  isLoggedIn$: Observable<boolean>;
   isLoggedOut$: Observable<boolean>;
 
 
-  constructor(private router: Router, private store: Store<AppState>) {}
+  constructor(private router: Router, private store: Store<AppState>) { }
 
   ngOnInit() {
     this.router.events.subscribe((event) => {
@@ -46,21 +47,25 @@ export class AppComponent implements OnInit {
       }
     });
 
-  // this.isLoggedIn$= this.store.pipe(
-  //   map(state=> !!state["auth"].user)
-  // )
+    // this.isLoggedIn$= this.store.pipe(
+    //   map(state=> !!state["auth"].user)
+    // )
 
-  this.isLoggedIn$= this.store.pipe(
-    select(isLoggedIn)  //parameter is selector function
-  )
+    this.isLoggedIn$ = this.store.pipe(
+      select(isLoggedIn)  //parameter is selector function
+    )
 
 
-this.isLoggedOut$=this.store.pipe(
-  select(isLoggedOut)
-)
+    this.isLoggedOut$ = this.store.pipe(
+      select(isLoggedOut)
+    )
 
 
   }
 
-  logout() {}
+  logout() {
+    this.store.dispatch(logout());
+
+
+  }
 }
