@@ -12,6 +12,7 @@ import {
 import { AppState } from "./reducers";
 import { isLoggedIn, isLoggedOut } from "./auth/auth.selectors";
 import { logout } from "./auth/auth.actions";
+import { AuthActions } from "./auth/action-types";
 
 @Component({
   selector: "app-root",
@@ -24,8 +25,7 @@ export class AppComponent implements OnInit {
   isLoggedIn$: Observable<boolean>;
   isLoggedOut$: Observable<boolean>;
 
-
-  constructor(private router: Router, private store: Store<AppState>) { }
+  constructor(private router: Router, private store: Store<AppState>) {}
 
   ngOnInit() {
     this.router.events.subscribe((event) => {
@@ -52,20 +52,19 @@ export class AppComponent implements OnInit {
     // )
 
     this.isLoggedIn$ = this.store.pipe(
-      select(isLoggedIn)  //parameter is selector function
-    )
+      select(isLoggedIn) //parameter is selector function
+      //select ngrx operator cobination of debounce and map operator
+    );
 
+    this.isLoggedOut$ = this.store.pipe(select(isLoggedOut));
 
-    this.isLoggedOut$ = this.store.pipe(
-      select(isLoggedOut)
-    )
-
-
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      this.store.dispatch(AuthActions.login({user: JSON.parse(userData)}));
+    }
   }
 
   logout() {
     this.store.dispatch(logout());
-
-
   }
 }
