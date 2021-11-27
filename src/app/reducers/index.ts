@@ -1,3 +1,4 @@
+import { state } from '@angular/animations';
 import { routerReducer } from '@ngrx/router-store';
 import {
   ActionReducer,
@@ -6,6 +7,7 @@ import {
   createSelector,
   MetaReducer
 } from '@ngrx/store';
+import { Action } from 'rxjs/internal/scheduler/Action';
 import { environment } from '../../environments/environment';
 
 
@@ -19,5 +21,15 @@ export const reducers: ActionReducerMap<AppState> = {
   router: routerReducer
 };
 
+export function logger (reducer: ActionReducer<any>) : ActionReducer<any>
+{
 
-export const metaReducers: MetaReducer<AppState>[] = !environment.production ? [] : [];
+  return (state,action) =>{
+    console.log("current status before: " + state);
+    console.log("action: " +action);
+
+    return reducer(state,action);
+  }
+}
+
+export const metaReducers: MetaReducer<AppState>[] = !environment.production ? [logger] : [];
