@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/router";
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { filter, first, map, tap } from "rxjs/operators";
 import { CourseEntityService } from "./course-entity.service";
 
 @Injectable()
@@ -11,10 +11,21 @@ constructor(private coursesService:CourseEntityService){}//we need to use course
 
   resolve(route:ActivatedRouteSnapshot, routeState: RouterStateSnapshot):Observable<boolean> {
 
-    return this.coursesService.getAll()
-    .pipe(
-      map(courses=> !!courses) //converting array to boolean
-    )
+
+    return this.coursesService.loaded$.pipe(
+      tap(loaded=>{
+        if(!loaded)
+        {
+        this.coursesService.getAll() //if not loaded then it will trigger
+
+        }//if closed
+
+      }),//tap close
+      filter(loaded=>!!loaded), //if not loaded then in next emited value we will get true
+      first() //return first value(always true)
+    );//pipe closed
+
+
 
   }
 }
